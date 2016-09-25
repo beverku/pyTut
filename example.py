@@ -40,6 +40,13 @@ class TestPythonBasics(unittest.TestCase):
             'word1' + 3
         self.assertEqual('word13', 'word1' + str(3))
 
+    def test_Strings_split(self):
+
+        #split() with no arg splits on white
+        l = 'This is a string\twith\n\n\twhite'.split()
+        self.assertEqual( ['This', 'is', 'a', 'string', 'with', 'white'], l)
+
+
     def test_Strings_slice(self):
 
         # s[start:end] # substring start through end-1
@@ -94,6 +101,11 @@ class TestPythonBasics(unittest.TestCase):
         a.append(4)
         self.assertEqual([0, 2, 3, 4], a)
         self.assertEqual([0, 2, 3, 4], b)
+
+        # Use "in" keyword to test
+        a = [1, 2, 3]
+        self.assertTrue( 1 in a )
+        self.assertFalse( 4 in a )
 
     def test_Lists_copy(self):
         # to (shallow) copy the array use slice
@@ -193,6 +205,8 @@ class TestPythonBasics(unittest.TestCase):
     # Tuples
     ##################################
     def test_Tuples(self):
+
+        #tuples are defined with ()
         t = (1, 2, 3)
 
         # Access with []
@@ -206,6 +220,71 @@ class TestPythonBasics(unittest.TestCase):
         (x, y) = (1, 2)
         self.assertEqual(1, x) 
         self.assertEqual(2, y) 
+
+
+    ##################################
+    # Dictionaries
+    ##################################
+    def test_Dictionaries(self):
+
+        # dictionaries are defined with {}
+        d = {}
+
+        # You can Access with []
+        d['key1'] = 'val1'
+        d['key2'] = 'val2'
+        d['key3'] = 'val3'
+        self.assertEqual('val1', d['key1'])
+
+        # But Accessing a non-existent key is an error
+        with self.assertRaises(KeyError):
+            x = d['noSuchKey']
+
+        # There is a .get method that will retrun the value or None
+        self.assertEqual('val1', d.get('key1'))
+        self.assertIsNone(d.get('noSuchKey'))
+
+        # Use "in" keyword to test
+        self.assertTrue( 'key1' in d )
+        self.assertFalse( 'noSuchKey' in d )
+
+        # keys / values
+        self.assertEqual( ['key1', 'key2', 'key3'], sorted( d.keys() ) ) # sorted needed because order is not guaranteed
+        self.assertEqual( ['val1', 'val2', 'val3'], sorted( d.values() ) ) # sorted needed because order is not guaranteed
+
+        # items - returns key/value as a tuple
+        # sorted needed because order is not guaranteed
+        self.assertEqual( [ ('key1', 'val1'), ('key2', 'val2'), ('key3', 'val3') ], sorted( d.items() ) ) 
+
+
+    ##################################
+    # Read/Write files
+    ##################################
+    def test_Read_Write_Files(self):
+
+        # Open for reading U with universal line endings i.e. \n or \r or \r\n
+        file1 = open('./file1.txt', 'rU')
+
+        # This will read the file line by line
+        s = ''
+        for line in file1:
+            s += line
+        file1.close()
+        self.assertEqual('line1\nline2\nline3 word2\n', s)
+
+        # This will read all lines into a list
+        file1 = open('./file1.txt', 'rU')
+        lines = file1.readlines()
+        file1.close()
+        # Notice newlines are still there
+        self.assertEqual( ['line1\n', 'line2\n', 'line3 word2\n'], lines)
+
+        # This will read the entire file into a String
+        file1 = open('./file1.txt', 'rU')
+        s = file1.read()
+        file1.close()
+        self.assertEqual('line1\nline2\nline3 word2\n', s)
+
 
 
 # Boilerplate for running unit test when this script is called

@@ -39,7 +39,34 @@ print_words() and print_top().
 
 import sys
 
-# +++your code here+++
+def count_words(filename):
+    wordCountMap = {}
+    f = open(filename, 'rU')
+    s = f.read()
+    for word in s.split():
+        word = word.lower()
+        if not word in wordCountMap:
+            wordCountMap[word] = 0
+        wordCountMap[word] += + 1
+
+    return wordCountMap
+
+
+def print_words(filename):
+    wordCountMap = count_words(filename)
+    for wordCount in sorted(wordCountMap.items()):
+        print wordCount[0], wordCount[1]
+
+def byCount(wordCount):
+    return wordCount[1]
+
+def print_top(filename):
+    wordCountMap = count_words(filename)
+    items = sorted(wordCountMap.items(), key=lambda wordCount: wordCount[1], reverse=True)
+    for wordCount in items[:20]:
+        print wordCount[0], wordCount[1]
+
+
 # Define print_words(filename) and print_top(filename) functions.
 # You could write a helper utility function that reads a file
 # and builds and returns a word/count dict for it.
