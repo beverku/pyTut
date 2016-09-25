@@ -3,6 +3,7 @@
 """-tt tells python to stop if there is mixed tabs and spaces in the file"""
 
 import unittest
+import re
 
 class TestPythonBasics(unittest.TestCase):
 
@@ -10,6 +11,22 @@ class TestPythonBasics(unittest.TestCase):
         """self instead of this"""
         """No block comments"""
         return
+
+
+    ##################################
+    # Falsey
+    ##################################
+    def test_Falsey(self):
+
+        self.assertFalse(None)
+        self.assertFalse(0)
+        self.assertTrue('0')
+        self.assertFalse('')
+
+        # empty list is false
+        self.assertFalse([])
+
+
 
 
     ##################################
@@ -284,6 +301,44 @@ class TestPythonBasics(unittest.TestCase):
         s = file1.read()
         file1.close()
         self.assertEqual('line1\nline2\nline3 word2\n', s)
+
+
+    ##################################
+    # Regex
+    ##################################
+    def test_re(self):
+        # re.search returns a match opbject
+        # a leading r before a string - indicates it's a raw string - don't do any \ escaping etc.
+        match = re.search(r'([\w.]+)@([\w.]+)', 'blah blah ryan.bever@netapp.com blah blah')
+        if match:
+            self.assertEqual('ryan.bever@netapp.com', match.group() )  # group() is the entire match
+            self.assertEqual('ryan.bever', match.group(1) ) # group(i) is the individual group
+            self.assertEqual('netapp.com', match.group(2) )
+
+        # a non-match returns None
+        self.assertIsNone( re.search(r'dog', 'cat') )
+
+        # Ignore Case
+        self.assertIsNone( re.search('dog', 'blah DoG blah') )
+        self.assertEqual('DoG', re.search('dog', 'blah DoG blah', re.IGNORECASE).group())
+
+
+        # findall() returns all as list
+        # Notice I have removed the (groups)
+        results = re.findall(r'[\w.]+@[\w.]+', 'blah blah ryan.bever@netapp.com blah blah foo@bar')
+        self.assertEqual(['ryan.bever@netapp.com', 'foo@bar'], results)
+        # If I leave the groups in the list is Tuples of the groups
+        results = re.findall(r'([\w.]+)@([\w.]+)', 'blah blah ryan.bever@netapp.com blah blah foo@bar')
+        self.assertEqual([('ryan.bever', 'netapp.com'), ('foo', 'bar')], results)
+        # else empty list
+        self.assertEqual([], re.findall(r'dog', 'cat') )
+
+
+        # Here is a nice little idiom to just read an entire file and findall
+        file1 = open('./file1.txt', 'rU')
+        results = re.findall('line\d', file1.read())
+        self.assertEqual(['line1', 'line2', 'line3'], results)
+        file1.close()
 
 
 
