@@ -5,13 +5,8 @@
 import unittest
 import re
 
+
 class TestPythonBasics(unittest.TestCase):
-
-    def test_Wtf(self):
-        """self instead of this"""
-        """No block comments"""
-        return
-
 
     ##################################
     # Falsey
@@ -25,6 +20,20 @@ class TestPythonBasics(unittest.TestCase):
 
         # empty list is false
         self.assertFalse([])
+
+
+
+    ##################################
+    # Arithmetic
+    ##################################
+    def test_Arithmetic(self):
+        # Python only stores about 15 digits of a float
+        f = 3.14159265358979323846264338327950288419716939937510582097494459230781640628620899
+        self.assertEqual(3.141592653589793, f)
+
+        # Notice it rounds - not truncate
+        f = 0.123456789012345678
+        self.assertEqual(0.12345678901234568, f)
 
 
 
@@ -54,15 +63,15 @@ class TestPythonBasics(unittest.TestCase):
 
         # Unlike Java you can't cat a string an int
         with self.assertRaises(TypeError):
-            'word1' + 3
+            x = 'word1' + 3
+            print(x)
         self.assertEqual('word13', 'word1' + str(3))
 
     def test_Strings_split(self):
 
-        #split() with no arg splits on white
+        # split() with no arg splits on white
         l = 'This is a string\twith\n\n\twhite'.split()
         self.assertEqual( ['This', 'is', 'a', 'string', 'with', 'white'], l)
-
 
     def test_Strings_slice(self):
 
@@ -79,7 +88,8 @@ class TestPythonBasics(unittest.TestCase):
         self.assertEqual('Hello', s[:])
         self.assertEqual('Hlo', s[::2])
 
-        # The other feature is that start or end may be a negative number, which means it counts from the end of the String instead of the beginning. So:
+        # The other feature is that start or end may be a negative number, which means it counts
+        # from the end of the String instead of the beginning. So:
         # s[-1]    # last character in the String
         # s[-2:]   # last two substring in the String
         # s[:-2]   # everything except the last two substring
@@ -88,17 +98,32 @@ class TestPythonBasics(unittest.TestCase):
         self.assertEqual('Hel', s[:-2])
 
         # Python is kind to the programmer if there are fewer characters than you ask for. 
-        # For example, if you ask for a[:-2] and a only contains one character, you get an empty String instead of an error. 
+        # For example, if you ask for a[:-2] and a only contains one character, you get an
+        # empty String instead of an error.
         # Sometimes you would prefer the error, so you have to be aware that this may happen.
         self.assertEqual('ello', s[1:99])
         self.assertEqual('Hello', s[-99:])
         self.assertEqual('', s[:-99])
 
-
-        # Also can be important that [:] returns a shallow copy of a list. it means that every slice notation returns a list which have new address in memory, 
+        # Also can be important that [:] returns a shallow copy of a list. it means that every
+        # slice notation returns a list which have new address in memory,
         # but its elements would have same addresses that elements of source list have.
 
+    def test_Strings_slice(self):
+        # Use string methods instead of the string module.
+        # String methods are always much faster and share the same API
+        # with unicode strings.
 
+        # Use ''.startswith() and ''.endswith() instead of string slicing to check for prefixes or suffixes.
+        # startswith() and endswith() are cleaner and less error prone.
+        # For example:
+
+        # Yes:
+        foo = 'bar'
+        self.assertTrue(foo.startswith('bar'))
+
+        # No:
+        self.assertTrue(foo[:3] == 'bar')
 
 
 
@@ -114,7 +139,7 @@ class TestPythonBasics(unittest.TestCase):
         self.assertEqual([1, 2, 3], b)
 
         # Changes made to a are reflected in b
-        a[0] = 0;
+        a[0] = 0
         a.append(4)
         self.assertEqual([0, 2, 3, 4], a)
         self.assertEqual([0, 2, 3, 4], b)
@@ -133,7 +158,7 @@ class TestPythonBasics(unittest.TestCase):
 
         # Changes made to a are NOT reflected in b
         # Note if these were objects changes to the object would be reflected in b
-        a[0] = 0;
+        a[0] = 0
         a.append(4)
         self.assertEqual([0, 2, 3, 4], a)
         self.assertEqual([1, 2, 3], b)
@@ -170,7 +195,6 @@ class TestPythonBasics(unittest.TestCase):
         # Also can be important that [:] returns a shallow copy of a list. it means that every slice notation returns a list which have new address in memory, 
         # but its elements would have same addresses that elements of source list have.
 
-
     def test_Lists_append_extend(self):
         # append returns None - So don't do l = l.append(x)
         l = [1, 2, 3]
@@ -186,7 +210,6 @@ class TestPythonBasics(unittest.TestCase):
         l = [1, 2, 3]
         l.extend([4, 5])
         self.assertEqual([1, 2, 3, 4, 5], l)  # Notice elements appended
-
 
     def test_Lists_pop(self):
         l = [1, 2, 3]
@@ -215,6 +238,24 @@ class TestPythonBasics(unittest.TestCase):
         self.assertEqual( [ 'z', 'dd', 'cc', 'aaa', 'bbb'] , sl)
 
         # Notice this also demonstrates that the sorted method is stable
+
+    def test_Lists_comprehension(self):
+
+        # List comprehensions provide a concise way to create lists.
+        l = [ 'aaaa', 'bb', 'ccc' ]
+        l2 = [ len(s)   for s in l ]
+        self.assertEqual( [4, 2, 3], l2 ) 
+
+        # They can apply a filter
+        l = range(10)
+        evenSquares = [ x**2   for x in l   if x % 2 == 0 ]
+        self.assertEqual( [0, 4, 16, 36, 64], evenSquares ) 
+
+        l = range(10)
+        squareTuples = [  (x, x**2)   for x in l   if x % 2 == 0 ]
+        self.assertEqual( [ (0, 0), (2, 4), (4, 16), (6, 36), (8, 64) ], squareTuples ) 
+
+
 
 
 
