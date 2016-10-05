@@ -27,9 +27,9 @@ choices = ['rock', 'spock', 'paper', 'lizard', 'scissors']
 
 def get_choice(player_name):
     while True:
-        choice = raw_input(player_name + " enter choice (" + str(choices) + "): ")
+        choice = input(player_name + " enter choice (" + str(choices) + "): ")
         if choice.lower() in choices:
-            return choice, choices.index(choice)
+            return choice, choices.index(choice.lower())
 
     # Can't get here
     return None
@@ -58,7 +58,7 @@ def main():
     p2_choice = get_choice("Player 2")
 
     result = pick_winner(p1_choice[1], p2_choice[1])
-    print result
+    print(result)
 
 
 # Standard boilerplate to call the main() function to begin
