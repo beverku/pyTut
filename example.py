@@ -4,6 +4,8 @@
 
 import unittest
 import re
+import math
+import json
 
 
 globalVar1 = 1
@@ -20,18 +22,22 @@ class TestExample(unittest.TestCase):
 
         self.assertFalse(None)
         self.assertFalse(0)
-        self.assertTrue('0')
         self.assertFalse('')
 
-        # empty list is false
+        self.assertTrue('0')
+
+        # empty Sequences i.e. list, set, dict, tuple are false
         self.assertFalse([])
+        self.assertFalse(set())
+        self.assertFalse({})
+        self.assertFalse(())
 
 
 
     ##################################
     # Arithmetic
     ##################################
-    def test_Arithmetic(self):
+    def test_arithmetic(self):
         # Python only stores about 15 digits of a float
         f = 3.14159265358979323846264338327950288419716939937510582097494459230781640628620899
         self.assertEqual(3.141592653589793, f)
@@ -46,7 +52,7 @@ class TestExample(unittest.TestCase):
     ##################################
     # Strings
     ##################################
-    def test_Strings(self):
+    def test_strings(self):
 
         # Can use '' or ""
         s = "can't"
@@ -87,13 +93,13 @@ class TestExample(unittest.TestCase):
         )
         self.assertEqual('Which is probably more useful when used like this.  To create more readable code.', s)
 
-    def test_Strings_split(self):
+    def test_strings_split(self):
 
         # split() with no arg splits on white
         l = 'This is a string\twith\n\n\twhite'.split()
         self.assertEqual( ['This', 'is', 'a', 'string', 'with', 'white'], l)
 
-    def test_Strings_slice(self):
+    def test_strings_slice(self):
 
         # One way to remember how slices work is to think of the indices as pointing between characters,
         # with the left edge of the first character numbered 0.
@@ -138,7 +144,7 @@ class TestExample(unittest.TestCase):
         # slice notation returns a list which have new address in memory,
         # but its elements would have same addresses that elements of source list have.
 
-    def test_Strings_methods(self):
+    def test_strings_methods(self):
         # Use string methods instead of the string module.
         # String methods are always much faster and share the same API
         # with unicode strings.
@@ -153,6 +159,57 @@ class TestExample(unittest.TestCase):
 
         # No:
         self.assertTrue(foo[:3] == 'bar')
+
+    def test_strings_format(self):
+        # Basic usage of the str.format() method looks like this:
+        formatted = 'We are the {} who say "{}!"'.format('knights', 'Ni')
+        self.assertEqual('We are the knights who say "Ni!"', formatted)
+
+        # positional
+        formatted = '{0} and {1}'.format('spam', 'eggs')
+        self.assertEqual('spam and eggs', formatted)
+
+        formatted = '{1} and {0}'.format('spam', 'eggs')
+        self.assertEqual('eggs and spam', formatted)
+
+        # keyword
+        formatted = 'This {food} is {adjective}.'.format( food = 'spam', adjective = 'absolutely horrible')
+        self.assertEqual('This spam is absolutely horrible.', formatted)
+
+        # An optional ':' and format specifier can follow the field name.
+        # This allows greater control over how the value is formatted.
+
+        # float
+        formatted = 'The value of PI is approximately {0:.3f}.'.format(math.pi)
+        self.assertEqual('The value of PI is approximately 3.142.', formatted)
+
+        # space separated
+        formatted = '{0:10} ==> {1:10d}'.format('a name', 1234)
+        #                 1234567890 ==> 1234567890
+        self.assertEqual('a name     ==>       1234', formatted)
+
+        # strings are r-padded and integers l-padded
+        formatted = '{0:10} ==> {1:10}'.format('a name', 'b name')
+        #                 1234567890 ==> 1234567890
+        self.assertEqual('a name     ==> b name    ', formatted)
+
+        # integers l-padded
+        formatted = '{0:10d} ==> {1:10d}'.format(1234, 567)
+        #                 1234567890 ==> 1234567890
+        self.assertEqual('      1234 ==>        567', formatted)
+
+    def test_strings_old_style_format(self):
+
+        # The % operator can also be used for string formatting.
+        # It interprets the left argument much like a sprintf()-style format string to be applied to the right argument,
+        # and returns the string resulting from this formatting operation.For example:
+
+        formatted = 'The value of PI is approximately %5.3f.' % math.pi
+        self.assertEqual('The value of PI is approximately 3.142.', formatted)
+
+        formatted = 'an int: %05d' % 123
+        self.assertEqual('an int: 00123', formatted)
+
 
 
 
@@ -201,7 +258,7 @@ class TestExample(unittest.TestCase):
     ##################################
     # Lists
     ##################################
-    def test_Lists(self):
+    def test_lists(self):
         # References to lists are pointers
         a = [1, 2, 3]
         b = a
@@ -219,7 +276,7 @@ class TestExample(unittest.TestCase):
         self.assertTrue(1 in a)
         self.assertFalse(4 in a)
 
-    def test_Lists_copy(self):
+    def test_lists_copy(self):
         # to (shallow) copy the array use slice
         a = [1, 2, 3]
         b = a[:]
@@ -233,7 +290,7 @@ class TestExample(unittest.TestCase):
         self.assertEqual([0, 2, 3, 4], a)
         self.assertEqual([1, 2, 3], b)
 
-    def test_Lists_slice(self):
+    def test_lists_slice(self):
         # a[start:end] # items start through end-1
         # a[start:]    # items start through the rest of the array
         # a[:end]      # items from the beginning through end-1
@@ -274,7 +331,7 @@ class TestExample(unittest.TestCase):
         l[1:3] = []
         self.assertEqual([0, 3, 4], l)
 
-    def test_Lists_append_extend(self):
+    def test_lists_append_extend(self):
         # append returns None - So don't do l = l.append(x)
         l = [1, 2, 3]
         self.assertIsNone(l.append(4))
@@ -297,7 +354,7 @@ class TestExample(unittest.TestCase):
 
 
 
-    def test_Lists_pop(self):
+    def test_lists_pop(self):
         l = [1, 2, 3]
         item = l.pop()
         self.assertEqual(3, item)
@@ -308,7 +365,7 @@ class TestExample(unittest.TestCase):
         self.assertEqual(2, item)
         self.assertEqual([1, 3, 4], l)
 
-    def test_Lists_sorted(self):
+    def test_lists_sorted(self):
         # sorted returns a new list and l is unchanged
         l = [5, 2, 3, 1, 4]
         sl = sorted(l)
@@ -325,7 +382,7 @@ class TestExample(unittest.TestCase):
 
         # Notice this also demonstrates that the sorted method is stable
 
-    def test_Lists_comprehension(self):
+    def test_lists_comprehension(self):
 
         # List comprehensions provide a concise way to create lists.
         l = [ 'aaaa', 'bb', 'ccc' ]
@@ -346,7 +403,7 @@ class TestExample(unittest.TestCase):
     ##################################
     # Sets
     ##################################
-    def test_Sets(self):
+    def test_sets(self):
         # A set is an unordered collection with no duplicate elements.
         # Basic uses include membership testing and eliminating duplicate entries.
         # Set objects also support mathematical operations like
@@ -396,7 +453,7 @@ class TestExample(unittest.TestCase):
     ##################################
     # Tuples
     ##################################
-    def test_Tuples(self):
+    def test_tuples(self):
         # tuples are defined with ()
 
         # empty tuple
@@ -457,7 +514,7 @@ class TestExample(unittest.TestCase):
     ##################################
     # Dictionaries
     ##################################
-    def test_Dictionaries(self):
+    def test_dictionaries(self):
         # dictionaries are indexed by keys, which can be any immutable type;
         # strings and numbers can always be keys.
         # Tuples can be used as keys if they contain only strings, numbers, or tuples;
@@ -514,7 +571,7 @@ class TestExample(unittest.TestCase):
     ##################################
     # Read/Write files
     ##################################
-    def test_Read_Write_Files(self):
+    def test_read_files(self):
 
         # Open for reading U with universal line endings i.e. \n or \r or \r\n
         file1 = open('./file1.txt', 'rU')
@@ -524,6 +581,7 @@ class TestExample(unittest.TestCase):
         for line in file1:
             s += line
         file1.close()
+        # Notice newlines are still there
         self.assertEqual('line1\nline2\nline3 word2\n', s)
 
         # This will read all lines into a list
@@ -531,13 +589,69 @@ class TestExample(unittest.TestCase):
         lines = file1.readlines()
         file1.close()
         # Notice newlines are still there
-        self.assertEqual( ['line1\n', 'line2\n', 'line3 word2\n'], lines)
+        self.assertEqual(['line1\n', 'line2\n', 'line3 word2\n'], lines)
+
+        # This will ALSO read all lines into a list
+        file1 = open('./file1.txt', 'rU')
+        lines = list(file1)
+        file1.close()
+        # Notice newlines are still there
+        self.assertEqual(['line1\n', 'line2\n', 'line3 word2\n'], lines)
 
         # This will read the entire file into a String
         file1 = open('./file1.txt', 'rU')
         s = file1.read()
         file1.close()
         self.assertEqual('line1\nline2\nline3 word2\n', s)
+
+    def test_write_files(self):
+        # Write a String
+        with open('./out.txt', 'w') as fout:
+            fout.write('a String')
+        with open('./out.txt', 'rU') as f:
+            self.assertEqual('a String', f.read())
+
+        # Write a List
+        with open('./out.txt', 'w') as fout:
+            fout.writelines(['line1', 'line2', 'line3'])
+        with open('./out.txt', 'rU') as f:
+            # Notice no newlines
+            self.assertEqual('line1line2line3', f.read())
+
+        # Write a List - With newlines
+        with open('./out.txt', 'w') as fout:
+            fout.writelines(map(lambda line: line + '\n', ['line1', 'line2', 'line3']))
+        with open('./out.txt', 'rU') as f:
+            # Notice newlines
+            self.assertEqual('line1\nline2\nline3\n', f.read())
+
+
+    ##################################
+    # Read/Write JSON
+    ##################################
+    def test_read_json(self):
+
+        # python object to json string
+        json_string = json.dumps([1, 'simple', 'list'])
+        self.assertEqual('[1, "simple", "list"]', json_string)
+
+        # Notice this the dictionary looks a lot like json anyway
+        json_string = json.dumps({'key1': 'val1', 'key2': 'val2', 'key3': 3})
+        self.assertTrue('"key1": "val1"' in json_string)
+        self.assertTrue('"key2": "val2"' in json_string)
+        self.assertTrue('"key3": 3' in json_string)
+
+        # Load from json
+        l = json.loads('[1, "simple", "list"]')
+        self.assertEqual([1, 'simple', 'list'], l)
+
+        d = json.loads('{"key1": "val1", "key3": 3, "key2": "val2"}')
+        self.assertEqual({'key1': 'val1', 'key2': 'val2', 'key3': 3}, d)
+
+        # Note there are corresponding dump and load (without the trailing s) for file json
+
+
+
 
 
     ##################################
@@ -599,6 +713,30 @@ class TestExample(unittest.TestCase):
 
 
     ##################################
+    # Modules
+    ##################################
+
+    def test_modules(self):
+        # By convention this should go at the top of this module
+        import example_module
+
+        # Access function through module name
+        result = example_module.fib(8)
+        self.assertEqual([1, 1, 2, 3, 5, 8], result)
+
+        # Or by assigning it to a local variable
+        fib = example_module.fib
+        self.assertEqual([1, 1, 2, 3, 5, 8], fib(8))
+
+    def test_modules2(self):
+        # Or import the names into the symbol table directly
+        from example_module import fib
+
+        self.assertEqual([1, 1, 2, 3, 5, 8], fib(8))
+
+
+
+    ##################################
     # Functions
     ##################################
 
@@ -626,7 +764,6 @@ class TestExample(unittest.TestCase):
 
         :return: None
         """
-
 
         # functions can be assigned to variables
         my_fun1 = fun1
@@ -683,6 +820,7 @@ class TestExample(unittest.TestCase):
         self.assertEqual(1, a)
         self.assertEqual(2, b)
 
+
 def fun1():
     return 1
 
@@ -722,8 +860,6 @@ def swap(a, b):
     temp = a
     a = b
     b = temp
-
-
 
 
 
