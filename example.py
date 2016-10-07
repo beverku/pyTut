@@ -6,6 +6,7 @@ import unittest
 import re
 import math
 import json
+import random
 
 
 globalVar1 = 1
@@ -575,33 +576,35 @@ class TestExample(unittest.TestCase):
 
         # Open for reading U with universal line endings i.e. \n or \r or \r\n
         file1 = open('./file1.txt', 'rU')
+        file1.close()
+
+        # The with statement allows objects to be cleaned up properly
+        with open('./file1.txt', 'rU') as file1:
+            pass
 
         # This will read the file line by line
         s = ''
-        for line in file1:
-            s += line
-        file1.close()
+        with open('./file1.txt', 'rU') as file1:
+            for line in file1:
+                s += line
         # Notice newlines are still there
         self.assertEqual('line1\nline2\nline3 word2\n', s)
 
         # This will read all lines into a list
-        file1 = open('./file1.txt', 'rU')
-        lines = file1.readlines()
-        file1.close()
+        with open('./file1.txt', 'rU') as file1:
+            lines = file1.readlines()
         # Notice newlines are still there
         self.assertEqual(['line1\n', 'line2\n', 'line3 word2\n'], lines)
 
         # This will ALSO read all lines into a list
-        file1 = open('./file1.txt', 'rU')
-        lines = list(file1)
-        file1.close()
+        with open('./file1.txt', 'rU') as file1:
+            lines = list(file1)
         # Notice newlines are still there
         self.assertEqual(['line1\n', 'line2\n', 'line3 word2\n'], lines)
 
         # This will read the entire file into a String
-        file1 = open('./file1.txt', 'rU')
-        s = file1.read()
-        file1.close()
+        with open('./file1.txt', 'rU') as file1:
+            s = file1.read()
         self.assertEqual('line1\nline2\nline3 word2\n', s)
 
     def test_write_files(self):
@@ -735,6 +738,271 @@ class TestExample(unittest.TestCase):
         self.assertEqual([1, 1, 2, 3, 5, 8], fib(8))
 
 
+    ##################################
+    # Try / Except
+    ##################################
+
+    def test_try(self):
+        """
+        The try ...except statement has an optional else clause, which, when present,
+        must follow all except clauses.  It is useful for code that must be executed
+        if the try clause does not raise an exception.
+        The use of the else clause is better than adding additional code to the try
+        clause because it avoids accidentally catching an exception that wasn’t
+        raised by the code being protected by the try...except statement.
+        """
+
+        try:
+            f = open('noSuchFile.txt', 'rU')
+        except FileNotFoundError as e:
+            self.assertIsInstance(e, FileNotFoundError)
+        else:
+            f.close()
+            self.fail('Expected FileNotFoundError')
+            # finally:
+            # Do finally actions here...
+
+        # If an exception has arguments, they are printed as the last part
+        # (‘detail’) of the message for unhandled exceptions.
+        try:
+            raise MyException('Exception Message', 'you can also add arbitrary arguments', ['list', 'of', 'stuff'])
+        except MyException as e:
+            self.assertIsInstance(e, MyException)
+            self.assertEquals(
+                ('Exception Message', 'you can also add arbitrary arguments', ['list', 'of', 'stuff']),
+                e.args)
+        else:
+            self.fail('Expected MyException')
+
+
+
+    ##################################
+    # Generators / Generator expressions
+    ##################################
+
+    def test_generators(self):
+        """
+        Generators are a simple and powerful tool for creating iterators.
+        They are written like regular functions but use the yield statement
+        whenever they want to return data. Each time next() is called on it,
+        the generator resumes where it left off
+        (it remembers all the data values and which statement was last executed).
+        """
+
+        # This returns an iterator...
+        def reverse(data):
+            for index in range(len(data) - 1, -1, -1):
+                yield data[index]
+
+        s = ''
+        for char in reverse('golf'):
+            s += char
+        self.assertEqual('flog', s)
+
+    def test_generator_expression(self):
+        """
+        Some simple generators can be coded succinctly as expressions using a syntax
+        similar to list comprehensions but with parentheses instead of brackets.
+        These expressions are designed for situations where the generator is used
+        right away by an enclosing function. Generator expressions are more compact
+        but less versatile than full generator definitions and tend to be more memory
+        friendly than equivalent list comprehensions.
+        """
+
+        # sum of squares
+        result = 0
+        for a_square in (i * i for i in range(10)):
+            result += a_square
+        self.assertEqual(285, result)
+
+        # Or more compactly - using sum() function - which takes an iterable
+        result = sum(i * i for i in range(10))
+        self.assertEqual(285, result)
+
+
+    ##################################
+    # Classes
+    ##################################
+
+    def test_classes(self):
+        class Dog:
+            """Dog class ..."""
+
+            kind = 'canine'
+            """class variable shared by ALL instances"""
+
+            def __init__(self, name):
+                self.name = name
+                """instance variable"""
+
+                self.tricks = []
+                """Correct use of instance variable"""
+
+            def do_trick(self):
+                if not self.tricks:
+                    return "Sorry, I don't know any :("
+                return random.choice(self.tricks)
+
+        with self.assertRaises(TypeError):
+            Dog()
+
+        d1 = Dog('Fido')
+        d2 = Dog('Buddy')
+
+        self.assertEqual('canine', d1.kind)
+        self.assertEqual('canine', d2.kind)
+
+        self.assertEqual('Fido', d1.name)
+        self.assertEqual('Buddy', d2.name)
+
+        d1.tricks.append('roll-over')
+        d1.tricks.append('fetch')
+
+        self.assertEqual(['roll-over', 'fetch'], d1.tricks)
+        self.assertEqual([], d2.tricks)
+
+        self.assertNotEqual("Sorry, I don't know any :(", d1.do_trick())
+        self.assertEqual("Sorry, I don't know any :(", d2.do_trick())
+
+    def test_classes_private_attributes(self):
+        """ “Private” instance variables that cannot be accessed except from inside an object don’t exist in Python.
+
+        However, there is a convention that is followed by most Python code:
+        a name prefixed with an underscore (e.g. _spam) should be treated as a non-public part of the API
+        (whether it is a function, a method or a data member).
+        It should be considered an implementation detail and subject to change without notice.
+        """
+        class Dog:
+            def __init__(self, name):
+                self.name = name
+                """instance variable"""
+
+                self._tricks = []
+                """ 'Private' - By Convention"""
+
+            def add_trick(self, trick):
+                self._tricks.append(trick)
+
+            def do_trick(self):
+                if not self._tricks:
+                    return "Sorry, I don't know any :("
+                return self._random_trick()
+
+            def _random_trick(self):
+                """ 'Private' - By Convention"""
+                return random.choice(self._tricks)
+
+        d1 = Dog('Fido')
+
+        self.assertEqual("Sorry, I don't know any :(", d1.do_trick())
+        d1.add_trick('fetch')
+        self.assertNotEqual("Sorry, I don't know any :(", d1.do_trick())
+
+        # Though you can still do this - Don't
+        d1._tricks.append('sit')
+        self.assertEqual(['fetch', 'sit'], d1._tricks)
+
+    def test_classes_class_variables(self):
+        """
+        Shared data can have possibly surprising effects with involving
+        MUTABLE OBJECTS
+        such as lists and dictionaries.
+
+        For example, the bad_tricks list in the following code should not be used
+        as a class variable because just a single list would be shared by all Dog instances:
+        """
+
+        class Dog:
+            """Dog class ..."""
+
+            kind = 'canine'
+            """class variable shared by ALL instances"""
+
+            total_dog_count = 10
+            """class variable shared by ALL instances"""
+
+            bad_tricks = []
+            """MISTAKE: mistaken use of class variable"""
+
+            def __init__(self, name):
+                self.name = name
+                """instance variable"""
+
+        d1 = Dog('Fido')
+        d2 = Dog('Buddy')
+
+        ####
+        # Simple example
+        ####
+        d1.kind = 'Bulldog'
+        self.assertEqual('canine', Dog.kind)
+        self.assertEqual('Bulldog', d1.kind)
+        self.assertEqual('canine', d2.kind)
+
+        ####
+        # More complicated example
+        ####
+        # This part is as expected
+        Dog.total_dog_count += 1
+        Dog.total_dog_count += 1
+        Dog.total_dog_count += 1
+        self.assertEqual(13, Dog.total_dog_count)
+        self.assertEqual(13, d1.total_dog_count)
+        self.assertEqual(13, d2.total_dog_count)
+
+        # If accessed through an instance the value is copied to d1.total_doc_count
+        d1.total_dog_count += 1
+        self.assertEqual(13, Dog.total_dog_count)
+        self.assertEqual(14, d1.total_dog_count)
+        self.assertEqual(13, d2.total_dog_count)
+
+        # Update class variable
+        Dog.total_dog_count += 1
+        Dog.total_dog_count += 1
+        self.assertEqual(15, Dog.total_dog_count)
+        self.assertEqual(14, d1.total_dog_count)    # d1.total_dog_count not updated as it's now a separate copy
+        self.assertEqual(15, d2.total_dog_count)
+
+        # delete the copied local instance of d1.total_dog_count then it will use the class variable again
+        del d1.total_dog_count
+        self.assertEqual(15, Dog.total_dog_count)
+        self.assertEqual(15, d1.total_dog_count)    # d1.total_dog_count now class variable again
+        self.assertEqual(15, d2.total_dog_count)
+
+
+        ####
+        # Mutable Type example
+        ####
+        d1.bad_tricks.append('sit')
+        d2.bad_tricks.append('play-dead')
+        self.assertEqual(['sit', 'play-dead'], d1.bad_tricks)
+        self.assertEqual(['sit', 'play-dead'], d2.bad_tricks)
+
+        Dog.bad_tricks.append('down')
+        self.assertEqual(['sit', 'play-dead', 'down'], Dog.bad_tricks)
+        self.assertEqual(['sit', 'play-dead', 'down'], Dog('new dog').bad_tricks)
+        self.assertEqual(['sit', 'play-dead', 'down'], d1.bad_tricks)
+        self.assertEqual(['sit', 'play-dead', 'down'], d2.bad_tricks)
+
+    def test_classes_data_method_attribute_collision(self):
+        """
+        Data attributes override method attributes with the same name.
+        To avoid accidental name conflicts, which may cause hard-to-find bugs in large programs,
+        it is wise to use some kind of convention that minimizes the chance of conflicts.
+        """
+        class Dog:
+            def __init__(self, name):
+                self.name = name
+
+            def name(self):
+                return 'My name is: ' + self.name
+
+        d1 = Dog('Fido')
+
+        self.assertEqual('Fido', d1.name)
+        with self.assertRaises(TypeError):
+            d1.name()
+
 
     ##################################
     # Functions
@@ -862,6 +1130,9 @@ def swap(a, b):
     b = temp
 
 
+class MyException(Exception):
+    """Exception for testing example exceptions."""
+    pass
 
 
 # Boilerplate for running unit test when this script is called
