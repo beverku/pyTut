@@ -1,5 +1,6 @@
-#!/usr/bin/python -tt
+#!/usr/bin/env python3.5 -tt
 
+# -*- coding: ascii -*-
 """-tt tells python to stop if there is mixed tabs and spaces in the file"""
 
 import unittest
@@ -20,7 +21,7 @@ class TestExample(unittest.TestCase):
     # Falsey
     ##################################
     def test_Falsey(self):
-
+	# tab
         self.assertFalse(None)
         self.assertFalse(0)
         self.assertFalse('')
@@ -174,7 +175,7 @@ class TestExample(unittest.TestCase):
         self.assertEqual('eggs and spam', formatted)
 
         # keyword
-        formatted = 'This {food} is {adjective}.'.format( food = 'spam', adjective = 'absolutely horrible')
+        formatted = 'This {food} is {adjective}.'.format(food='spam', adjective='absolutely horrible')
         self.assertEqual('This spam is absolutely horrible.', formatted)
 
         # An optional ':' and format specifier can follow the field name.
@@ -748,7 +749,7 @@ class TestExample(unittest.TestCase):
         must follow all except clauses.  It is useful for code that must be executed
         if the try clause does not raise an exception.
         The use of the else clause is better than adding additional code to the try
-        clause because it avoids accidentally catching an exception that wasn’t
+        clause because it avoids accidentally catching an exception that wasn't
         raised by the code being protected by the try...except statement.
         """
 
@@ -763,7 +764,7 @@ class TestExample(unittest.TestCase):
             # Do finally actions here...
 
         # If an exception has arguments, they are printed as the last part
-        # (‘detail’) of the message for unhandled exceptions.
+        # ('detail') of the message for unhandled exceptions.
         try:
             raise MyException('Exception Message', 'you can also add arbitrary arguments', ['list', 'of', 'stuff'])
         except MyException as e:
@@ -865,7 +866,7 @@ class TestExample(unittest.TestCase):
         self.assertEqual("Sorry, I don't know any :(", d2.do_trick())
 
     def test_classes_private_attributes(self):
-        """ “Private” instance variables that cannot be accessed except from inside an object don’t exist in Python.
+        """ "Private" instance variables that cannot be accessed except from inside an object don't exist in Python.
 
         However, there is a convention that is followed by most Python code:
         a name prefixed with an underscore (e.g. _spam) should be treated as a non-public part of the API
@@ -987,6 +988,7 @@ class TestExample(unittest.TestCase):
     def test_classes_data_method_attribute_collision(self):
         """
         Data attributes override method attributes with the same name.
+
         To avoid accidental name conflicts, which may cause hard-to-find bugs in large programs,
         it is wise to use some kind of convention that minimizes the chance of conflicts.
         """
@@ -1009,23 +1011,23 @@ class TestExample(unittest.TestCase):
     ##################################
 
     def test_functions(self):
-        """The first line should always be a short, concise summary of the object’s purpose.
+        """The first line should always be a short, concise summary of the object's purpose.
 
-        For brevity, it should not explicitly state the object’s name or type,
+        For brevity, it should not explicitly state the object's name or type,
         since these are available by other means (except if the name happens to be a
-        verb describing a function’s operation).
+        verb describing a function's operation).
         This line should begin with a capital letter and end with a period.
 
         If there are more lines in the documentation string, the second line should be blank,
         visually separating the summary from the rest of the description. The following lines
-        should be one or more paragraphs describing the object’s calling conventions, its side effects, etc.
+        should be one or more paragraphs describing the object's calling conventions, its side effects, etc.
 
         The Python parser does not strip indentation from multi-line string literals in Python,
         so tools that process documentation have to strip indentation if desired.
         This is done using the following convention. The first non-blank line after the first line of
         the string determines the amount of indentation for the entire documentation string.
-        (We can’t use the first line since it is generally adjacent to the string’s opening quotes
-        so its indentation is not apparent in the string literal.) Whitespace “equivalent” to this
+        (We can't use the first line since it is generally adjacent to the string's opening quotes
+        so its indentation is not apparent in the string literal.) Whitespace "equivalent" to this
         indentation is then stripped from the start of all lines of the string. Lines that are indented
         less should not occur, but if they occur all their leading whitespace should be stripped.
         Equivalence of whitespace should be tested after expansion of tabs (to 8 spaces, normally).
@@ -1130,6 +1132,25 @@ def swap(a, b):
     b = temp
 
 
+def doc_test_example(a, b):
+    """
+    | If a docString contains a python REPL output like below it can be tested with doctest:
+    | ``$ python3.5 -m doctest -v example.py``
+
+
+    >>> doc_test_example(1, 2)
+    1
+    2
+
+    :param a: Will be printed first
+    :param b: Will be printed second
+    :return: None
+    """
+
+    print(a)
+    print(b)
+
+
 class MyException(Exception):
     """Exception for testing example exceptions."""
     pass
@@ -1137,5 +1158,6 @@ class MyException(Exception):
 
 # Boilerplate for running unit test when this script is called
 # With more verbose output
-suite = unittest.TestLoader().loadTestsFromTestCase(TestExample)
-unittest.TextTestRunner(verbosity=2).run(suite)
+if __name__ == '__main__':
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestExample)
+    unittest.TextTestRunner(verbosity=2).run(suite)
