@@ -42,8 +42,18 @@ def answer3():
     print(_sum)
 
 
+##############################
+# Using filter and lambda accomplishes the same result
+# But it's visually noisy - see item 7 of effective python
+##############################
+def answer4():
+    _sum = sum(list(filter(lambda i: i % 3 == 0 or i % 5 == 0, range(1000))))
+    print(_sum)
+
+
 # This is the standard boilerplate that calls the main() function.
 if __name__ == '__main__':
     main()
     answer2()
     answer3()
+    answer4()

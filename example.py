@@ -569,6 +569,13 @@ class TestExample(unittest.TestCase):
         d = {x: x ** 2 for x in (2, 4, 6)}
         self.assertEqual({2: 4, 4: 16, 6: 36}, d)
 
+        # Dictionary comprehension - 2
+        chile_ranks = {'ghost': 1, 'habanero': 2, 'cayenne': 3}
+        # This will swap the keys and values
+        # Dictionary comprehension  tuple unpacking
+        rank_dict = {rank: name for name, rank in chile_ranks.items()}
+        self.assertEqual({1: 'ghost', 2: 'habanero', 3: 'cayenne'}, rank_dict)
+
 
     ##################################
     # Read/Write files
